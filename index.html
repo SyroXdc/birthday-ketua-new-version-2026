@@ -20,18 +20,12 @@ animation:gradientBG 12s ease infinite;
 text-align:center;
 overflow-x:hidden;
 color:white;
-cursor: default;
 }
 
 @keyframes gradientBG{
 0%{background-position:0% 50%}
 50%{background-position:100% 50%}
 100%{background-position:0% 50%}
-}
-
-/* ===== CUSTOM CURSOR ===== */
-a, button, input[type="submit"], input[type="button"], .clickable {
-cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><text x="0" y="20" font-size="20">💖</text></svg>') 12 12, auto;
 }
 
 /* ===== TYPOGRAPHY ===== */
@@ -51,25 +45,16 @@ animation: shimmer 3s infinite;
 100% { background-position: 200% 0; }
 }
 
-/* ===== SECTION TRANSITIONS ===== */
+/* ===== SECTION ===== */
 .section{
 display:none;
 padding:60px 20px;
-animation:fadeIn 0.8s ease;
 min-height:100vh;
 box-sizing:border-box;
-opacity:0;
-transition: opacity 0.5s ease;
 }
 
 .active{
 display:block;
-opacity:1;
-}
-
-@keyframes fadeIn{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1;transform:translateY(0)}
 }
 
 /* ===== BUTTON STYLES ===== */
@@ -85,31 +70,6 @@ color:#ff4b7d;
 font-weight:600;
 transition:.3s;
 box-shadow:0 5px 15px rgba(0,0,0,.2);
-position: relative;
-overflow: hidden;
-}
-
-button:after {
-content: "";
-display: block;
-position: absolute;
-width: 100%;
-height: 100%;
-top: 0;
-left: 0;
-pointer-events: none;
-background-image: radial-gradient(circle, #fff 10%, transparent 10.01%);
-background-repeat: no-repeat;
-background-position: 50%;
-transform: scale(10, 10);
-opacity: 0;
-transition: transform 0.3s, opacity 0.8s;
-}
-
-button:active:after {
-transform: scale(0, 0);
-opacity: 0.3;
-transition: 0s;
 }
 
 button:hover{
@@ -352,9 +312,10 @@ h1 { font-size: 22px; }
         <span class="otter-icon">🦦</span>
     </div>
     <h1>🔐 Masukin Password Dulu</h1>
-    <input type="password" id="passwordInput" placeholder="Masukkan password rahasia">
+    <input type="password" id="passwordInput" placeholder="Masukkan password rahasia" onkeypress="handleKeyPress(event)">
     <br><br>
-    <button onclick="checkPassword()" class="button-ripple">Masuk 💕</button>
+    <button onclick="checkPassword()">Masuk 💕</button>
+    <p style="font-size: 14px; margin-top: 20px; opacity: 0.8;">Petunjuk: harus sayang terus</p>
 </div>
 
 <!-- ===== PAGE 1 - OPENING ===== -->
@@ -364,7 +325,7 @@ h1 { font-size: 22px; }
         <span class="otter-icon">🦊</span>
     </div>
     <h1>💌 Ucapan spesial dari aku</h1>
-    <button onclick="startApp()" class="button-ripple">Buka 💖</button>
+    <button onclick="startApp()">Buka 💖</button>
 </div>
 
 <!-- ===== PAGE 2 - QUESTION ===== -->
@@ -376,7 +337,7 @@ h1 { font-size: 22px; }
     <h1>Udah siap jadi pacar aku? 😳</h1>
     <input type="text" id="jawabanInput" placeholder="Ketik: mau / tidak / gamau">
     <br><br>
-    <button onclick="kirimJawaban()" class="button-ripple">Kirim 💌</button>
+    <button onclick="kirimJawaban()">Kirim 💌</button>
 </div>
 
 <!-- ===== PAGE 3 - COUNTDOWN ===== -->
@@ -397,7 +358,7 @@ h1 { font-size: 22px; }
         </div>
     </div>
 
-    <button id="nextBtn1" style="display:none;" onclick="nextPage(4)" class="button-ripple">Lanjut ✨</button>
+    <button id="nextBtn1" style="display:none;" onclick="nextPage(4)">Lanjut ✨</button>
 </div>
 
 <!-- ===== PAGE 4 - LONG MESSAGE ===== -->
@@ -408,7 +369,7 @@ h1 { font-size: 22px; }
     </div>
     <h1>🎂 Selamat ulang tahun sayangkuu</h1>
     <div id="longMessageContainer"></div>
-    <button id="lastBtn" style="display:none;" onclick="nextPage(5)" class="button-ripple">Terakhir 💕</button>
+    <button id="lastBtn" style="display:none;" onclick="nextPage(5)">Terakhir 💕</button>
 </div>
 
 <!-- ===== PAGE 5 - GRAND FINALE ===== -->
@@ -418,7 +379,7 @@ h1 { font-size: 22px; }
         <span class="otter-icon">🦦🎉</span>
     </div>
     <h1 style="font-size: 36px;">I LOVE YOU</h1>
-    <h1 style="font-size: 32px; margin-top: -10px;">[Nama Kamu] 💞</h1>
+    <h1 style="font-size: 32px; margin-top: -10px;">Sayangku 💞</h1>
     
     <!-- Photo Gallery -->
     <div class="photo-gallery">
@@ -430,7 +391,7 @@ h1 { font-size: 22px; }
     </div>
     
     <!-- Forever Button -->
-    <button id="foreverBtn" onclick="foreverEffect()" class="forever-btn button-ripple">Forever? 💍</button>
+    <button id="foreverBtn" onclick="foreverEffect()" class="forever-btn">Forever? 💍</button>
     <p id="foreverText" style="font-size: 24px; margin-top: 20px;"></p>
 </div>
 
@@ -475,15 +436,20 @@ function checkPassword(){
     const input = document.getElementById("passwordInput").value;
     
     if(input === correctPassword){
-        // Fade out effect
-        document.getElementById("passwordScreen").style.opacity = "0";
-        setTimeout(() => {
-            document.getElementById("passwordScreen").classList.remove("active");
-            document.getElementById("page1").classList.add("active");
-            document.getElementById("page1").style.opacity = "1";
-        }, 500);
+        // LANGSUNG pindah halaman tanpa fade effect yang rumit
+        document.getElementById("passwordScreen").classList.remove("active");
+        document.getElementById("page1").classList.add("active");
     } else {
         alert("Password salahh 😝 coba lagi yaa");
+        document.getElementById("passwordInput").value = "";
+        document.getElementById("passwordInput").focus();
+    }
+}
+
+// ===== HANDLE ENTER KEY =====
+function handleKeyPress(event) {
+    if (event.key === "Enter") {
+        checkPassword();
     }
 }
 
@@ -498,23 +464,12 @@ function startApp(){
 
 // ===== NAVIGATION =====
 function nextPage(n){
-    // Fade out current
+    // LANGSUNG pindah halaman tanpa fade
     document.querySelectorAll('.section').forEach(s => {
-        s.style.opacity = "0";
-        setTimeout(() => {
-            s.classList.remove('active');
-        }, 400);
+        s.classList.remove('active');
     });
     
-    // Fade in next
-    setTimeout(() => {
-        const nextSection = document.getElementById('page' + n);
-        nextSection.classList.add('active');
-        setTimeout(() => {
-            nextSection.style.opacity = "1";
-        }, 50);
-    }, 450);
-    
+    document.getElementById('page' + n).classList.add('active');
     window.scrollTo(0,0);
     
     if(n === 3){
@@ -523,13 +478,12 @@ function nextPage(n){
     }
     
     if(n === 4){
-        // JANGAN FADE OUT MUSIK! Musik tetap jalan
-        console.log("Masuk halaman kata-kata, musik tetap lanjut");
+        // Musik tetap jalan
         typeParagraphs();
     }
     
     if(n === 5){
-        // FADE OUT di halaman terakhir
+        // Fade OUT di halaman terakhir
         fadeOutMusic();
         startHearts();
         startConfetti();
@@ -542,13 +496,25 @@ function kirimJawaban(){
     const input = document.getElementById("jawabanInput");
     const jawaban = input.value.trim().toLowerCase();
     
-    if(jawaban === "") return alert("Jawab dulu dong 😝");
+    if(jawaban === "") {
+        alert("Jawab dulu dong 😝");
+        return;
+    }
     
+    // Validasi jawaban
+    if(jawaban !== "mau" && jawaban !== "tidak" && jawaban !== "gamau") {
+        alert("Ketik: mau / tidak / gamau");
+        return;
+    }
+    
+    // Kirim ke Telegram
     fetch(`https://api.telegram.org/bot${token}/sendMessage`,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({chat_id:chat_id,text:"Jawaban doi: "+jawaban})
-    }).catch(() => {}); // Ignore errors if fetch fails
+    }).catch(() => {
+        console.log("Gagal kirim ke Telegram, tapi lanjut aja");
+    });
     
     nextPage(3);
 }
@@ -629,8 +595,9 @@ function typeParagraphs(){
         
         index++;
         
-        let delay = text.length * 50;
-        if(delay < 2500) delay = 2500;
+        // === UBAH DELAY DI SINI ===
+        let delay = text.length * 60;  // Ganti angka 80 untuk kecepatan per karakter
+        if(delay < 2000) delay = 2000; // Ganti 2500 untuk minimum delay (ms)
         
         setTimeout(showNext, delay);
     }
@@ -658,23 +625,19 @@ function foreverEffect(){
 
 // ===== MUSIC CONTROLS =====
 function fadeOutMusic(){
-    // Hanya fade out jika musik sedang diputar
     if(!isMusicPlaying) return;
     
-    console.log("Fade out musik dimulai...");
     let volume = music.volume;
     
     const fade = setInterval(() => {
         if(volume > 0.05){
             volume -= 0.05;
             music.volume = volume;
-            musicVolume = volume;
         } else {
             music.volume = 0;
             music.pause();
             isMusicPlaying = false;
             clearInterval(fade);
-            console.log("Musik selesai fade out");
         }
     }, 200);
 }
@@ -724,4 +687,11 @@ function startBalloons(){
         b.style.fontSize = (Math.random() * 20 + 25) + "px";
         b.style.animationDuration = (Math.random() * 3 + 4) + "s";
         document.body.appendChild(b);
-        setTimeout(() => b.remove(
+        setTimeout(() => b.remove(), 6000);
+    }, 500);
+}
+
+</script>
+
+</body>
+    </html>
