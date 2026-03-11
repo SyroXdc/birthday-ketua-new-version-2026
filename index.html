@@ -439,10 +439,6 @@ h1 { font-size: 22px; }
     <source src="lagu.mp3" type="audio/mpeg">
 </audio>
 
-<audio id="slowMusic" preload="auto" loop playsinline>
-    <source src="lagu_lambat.mp3" type="audio/mpeg">
-</audio>
-
 <script>
 
 // ===== CONFIGURATION =====
@@ -452,7 +448,8 @@ const chat_id = "7799715346";
 
 // ===== AUDIO ELEMENTS =====
 const music = document.getElementById("music");
-const slowMusic = document.getElementById("slowMusic");
+let isMusicPlaying = false;
+let musicVolume = 1;
 
 // ===== LONG MESSAGES =====
 const paragraphs = [
@@ -494,6 +491,8 @@ function checkPassword(){
 function startApp(){
     music.volume = 1;
     music.play().catch(() => {});
+    isMusicPlaying = true;
+    musicVolume = 1;
     nextPage(2);
 }
 
@@ -524,17 +523,14 @@ function nextPage(n){
     }
     
     if(n === 4){
-        // Switch to slow music
-        fadeOutMusic(music, () => {
-            slowMusic.volume = 0;
-            slowMusic.play().catch(() => {});
-            fadeInMusic(slowMusic);
-        });
+        // JANGAN FADE OUT MUSIK! Musik tetap jalan
+        console.log("Masuk halaman kata-kata, musik tetap lanjut");
         typeParagraphs();
     }
     
     if(n === 5){
-        fadeOutMusic(slowMusic);
+        // FADE OUT di halaman terakhir
+        fadeOutMusic();
         startHearts();
         startConfetti();
         startBalloons();
@@ -633,7 +629,7 @@ function typeParagraphs(){
         
         index++;
         
-        let delay = text.length * 80;
+        let delay = text.length * 50;
         if(delay < 2500) delay = 2500;
         
         setTimeout(showNext, delay);
@@ -661,33 +657,24 @@ function foreverEffect(){
 }
 
 // ===== MUSIC CONTROLS =====
-function fadeOutMusic(audioElement, callback){
-    let volume = audioElement.volume;
+function fadeOutMusic(){
+    // Hanya fade out jika musik sedang diputar
+    if(!isMusicPlaying) return;
+    
+    console.log("Fade out musik dimulai...");
+    let volume = music.volume;
     
     const fade = setInterval(() => {
         if(volume > 0.05){
             volume -= 0.05;
-            audioElement.volume = volume;
+            music.volume = volume;
+            musicVolume = volume;
         } else {
-            audioElement.volume = 0;
-            audioElement.pause();
+            music.volume = 0;
+            music.pause();
+            isMusicPlaying = false;
             clearInterval(fade);
-            if(callback) callback();
-        }
-    }, 200);
-}
-
-function fadeInMusic(audioElement){
-    let volume = 0;
-    audioElement.volume = volume;
-    
-    const fade = setInterval(() => {
-        if(volume < 0.95){
-            volume += 0.05;
-            audioElement.volume = volume;
-        } else {
-            audioElement.volume = 1;
-            clearInterval(fade);
+            console.log("Musik selesai fade out");
         }
     }, 200);
 }
@@ -737,18 +724,4 @@ function startBalloons(){
         b.style.fontSize = (Math.random() * 20 + 25) + "px";
         b.style.animationDuration = (Math.random() * 3 + 4) + "s";
         document.body.appendChild(b);
-        setTimeout(() => b.remove(), 6000);
-    }, 500);
-}
-
-// ===== ADD RIPPLE EFFECT TO ALL BUTTONS =====
-document.addEventListener('DOMContentLoaded', () => {
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach(btn => btn.classList.add('button-ripple'));
-});
-
-</script>
-
-</body>
-
-</html>
+        setTimeout(() => b.remove(
