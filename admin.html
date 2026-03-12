@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Gallery Photo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .admin-card {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            color: #764ba2;
+            font-size: 20px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+        }
+
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .photo-item {
+            text-align: center;
+        }
+
+        .photo-item label {
+            display: block;
+            margin-bottom: 10px;
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .photo-preview {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 3px solid #764ba2;
+            margin-bottom: 10px;
+            background: #f5f5f5;
+        }
+
+        .photo-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .upload-btn {
+            background: #764ba2;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-block;
+            transition: 0.3s;
+            border: none;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .upload-btn:hover {
+            background: #5a3780;
+            transform: scale(1.05);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 14px;
+            color: #666;
+            border-left: 4px solid #764ba2;
+        }
+
+        .info-box strong {
+            color: #764ba2;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #764ba2;
+            border: 2px solid #764ba2;
+        }
+
+        .btn-secondary:hover {
+            background: #764ba2;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #ff4757;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #ee3a4a;
+            transform: translateY(-2px);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-link a {
+            color: white;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.9;
+            transition: 0.3s;
+        }
+
+        .back-link a:hover {
+            opacity: 1;
+            text-decoration: underline;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification.show {
+            display: flex;
+        }
+
+        .notification.success {
+            border-left: 4px solid #00d25b;
+        }
+
+        .notification.error {
+            border-left: 4px solid #ff4757;
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        .notification-message {
+            color: #333;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        <span class="notification-icon" id="notificationIcon">✅</span>
+        <span class="notification-message" id="notificationMessage">Berhasil disimpan!</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>🔧 Admin Panel</h1>
+            <p>Kelola foto galeria untuk halaman ucapan</p>
+        </div>
+
+        <div class="admin-card">
+            <h2 class="section-title">📸 Gallery Photos</h2>
+            
+            <div class="photo-grid">
+                <!-- Photo 1 -->
+                <div class="photo-item">
+                    <label>Foto 1</label>
+                    <div class="photo-preview" id="preview1">
+                        <img id="previewImg1" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff9a9e'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 1%3C/text%3E%3C/svg%3E" alt="Preview 1">
+                    </div>
+                    <input type="file" id="fileInput1" accept="image/*" onchange="previewImage(1)">
+                    <label for="fileInput1" class="upload-btn">📁 Pilih Foto 1</label>
+                </div>
+
+                <!-- Photo 2 -->
+                <div class="photo-item">
+                    <label>Foto 2</label>
+                    <div class="photo-preview" id="preview2">
+                        <img id="previewImg2" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23fad0c4'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 2%3C/text%3E%3C/svg%3E" alt="Preview 2">
+                    </div>
+                    <input type="file" id="fileInput2" accept="image/*" onchange="previewImage(2)">
+                    <label for="fileInput2" class="upload-btn">📁 Pilih Foto 2</label>
+                </div>
+
+                <!-- Photo 3 -->
+                <div class="photo-item">
+                    <label>Foto 3</label>
+                    <div class="photo-preview" id="preview3">
+                        <img id="previewImg3" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a18cd1'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 3%3C/text%3E%3C/svg%3E" alt="Preview 3">
+                    </div>
+                    <input type="file" id="fileInput3" accept="image/*" onchange="previewImage(3)">
+                    <label for="fileInput3" class="upload-btn">📁 Pilih Foto 3</label>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>📌 Petunjuk:</strong>
+                • Klik tombol "Pilih Foto" untuk memilih gambar dari galeri<br>
+                • Format gambar: JPG, PNG, GIF (maksimal 5MB)<br>
+                • Setelah memilih foto, klik tombol "Simpan Semua Foto"<br>
+                • Foto akan tersimpan dan tampil di halaman ucapan utama
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn btn-primary" onclick="saveAllPhotos()">💾 Simpan Semua Foto</button>
+                <button class="btn btn-secondary" onclick="loadSavedPhotos()">🔄 Muat Foto Tersimpan</button>
+                <button class="btn btn-danger" onclick="resetToDefault()">🔄 Reset ke Default</button>
+            </div>
+        </div>
+
+        <div class="back-link">
+            <a href="index.html" target="_blank">← Kembali ke Halaman Ucapan</a>
+        </div>
+    </div>
+
+    <script>
+        // ===== NOTIFICATION FUNCTION =====
+        function showNotification(message, isSuccess = true) {
+            const notification = document.getElementById('notification');
+            const icon = document.getElementById('notificationIcon');
+            const messageEl = document.getElementById('notificationMessage');
+            
+            icon.textContent = isSuccess ? '✅' : '❌';
+            messageEl.textContent = message;
+            notification.className = `notification show ${isSuccess ? 'success' : 'error'}`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // ===== PREVIEW IMAGE =====
+        function previewImage(photoNumber) {
+            const input = document.getElementById(`fileInput${photoNumber}`);
+            const previewImg = document.getElementById(`previewImg${photoNumber}`);
+            
+            if (input.files && input.files[0]) {
+                // Check file size (max 5MB)
+                if (input.files[0].size > 5 * 1024 * 1024) {
+                    showNotification('Ukuran file maksimal 5MB', false);
+                    input.value = '';
+                    return;
+                }
+
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    showNotification(`Foto ${photoNumber} siap disimpan`);
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // ===== SAVE ALL PHOTOS =====
+        function saveAllPhotos() {
+            let savedCount = 0;
+            let totalPhotos = 0;
+
+            // Loop untuk menyimpan foto yang sudah dipilih
+            for (let i = 1; i <= 3; i++) {
+                const input = document.getElementById(`fileInput${i}`);
+                const previewImg = document.getElementById(`previewImg${i}`);
+                
+                // Jika ada file baru yang dipilih
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        try {
+                            localStorage.setItem(`galleryPhoto${i}`, e.target.result);
+                            savedCount++;
+                            totalPhotos++;
+                            
+                            // Jika semua sudah diproses
+                            if (totalPhotos === 3) {
+                                if (savedCount > 0) {
+                                    showNotification(`${savedCount} foto berhasil disimpan!`);
+                                } else {
+                                    showNotification('Tidak ada foto yang dipilih', false);
+                                }
+                            }
+                        } catch (e) {
+                            showNotification(`Gagal menyimpan foto ${i}`, false);
+                        }
+                    }
+                    
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    // Jika tidak ada file baru, simpan dari preview yang ada
+                    const currentSrc = previewImg.src;
+                    if (currentSrc && !currentSrc.includes('svg')) {
+                        try {
+                            localStorage.setItem(`galleryPhoto${i}`, currentSrc);
+                            savedCount++;
+                        } catch (e) {
+                            console.log(`Gagal menyimpan foto ${i}:`, e);
+                        }
+                    }
+                    totalPhotos++;
+                    
+                    // Jika semua sudah diproses
+                    if (totalPhotos === 3) {
+                        if (savedCount > 0) {
+                            showNotification(`${savedCount} foto berhasil disimpan!`);
+                        } else {
+                            showNotification('Tidak ada foto yang dipilih', false);
+                        }
+                    }
+                }
+            }
+        }
+
+        // ===== LOAD SAVED PHOTOS =====
+        function loadSavedPhotos() {
+            try {
+                let loadedCount = 0;
+                
+                for (let i = 1; i <= 3; i++) {
+                    const savedPhoto = localStorage.getItem(`galleryPhoto${i}`);
+                    if (savedPhoto) {
+                        document.getElementById(`previewImg${i}`).src = savedPhoto;
+                        loadedCount++;
+                    }
+                }
+                
+                if (loadedCount > 0) {
+                    showNotification(`${loadedCount} foto dimuat dari penyimpanan`);
+                } else {
+                    showNotification('Belum ada foto tersimpan', false);
+                }
+            } catch (e) {
+                showNotification('Gagal memuat foto', false);
+            }
+        }
+
+        // ===== RESET TO DEFAULT =====
+        function resetToDefault() {
+            if (confirm('Yakin ingin mereset semua foto ke default?')) {
+                try {
+                    const defaultPhotos = [
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23ff9a9e'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 1%3C/text%3E%3C/svg%3E",
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23fad0c4'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 2%3C/text%3E%3C/svg%3E",
+                        "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23a18cd1'/%3E%3Ctext x='10' y='55' fill='white' font-size='14' font-family='Arial'%3E❤️ 3%3C/text%3E%3C/svg%3E"
+                    ];
+                    
+                    for (let i = 1; i <= 3; i++) {
+                        document.getElementById(`previewImg${i}`).src = defaultPhotos[i-1];
+                        localStorage.removeItem(`galleryPhoto${i}`);
+                    }
+                    
+                    // Reset file input
+                    document.getElementById('fileInput1').value = '';
+                    document.getElementById('fileInput2').value = '';
+                    document.getElementById('fileInput3').value = '';
+                    
+                    showNotification('Semua foto direset ke default');
+                } catch (e) {
+                    showNotification('Gagal mereset foto', false);
+                }
+            }
+        }
+
+        // ===== LOAD SAVED PHOTOS ON PAGE LOAD =====
+        window.onload = function() {
+            loadSavedPhotos();
+        }
+    </script>
+</body>
+</html>
